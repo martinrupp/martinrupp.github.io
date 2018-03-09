@@ -106,7 +106,7 @@ function int_random(from, to_exclusive)
 
 function shuffle_arr( arr )
 {
-	for(var i=0; i<arr.length-1; i++)
+	for(let i=0; i<arr.length-1; i++)
 	{
 		const r = int_random(i, arr.length);
 		const t = arr[i];
@@ -160,7 +160,8 @@ function draw()
 
 	context.font = "10px Arial";
 	context.fillText( player.points + " Points", 130, 190);
-	context.fillText( Math.round(1000/deltaTime, 1) + " FPS", 130, 170);
+	context.fillText( Math.round(1000/deltaTime, 1) + " FPS", 130, 110);
+	context.fillText( player.total_cleared_lines + " lines", 130, 170);
 	context.fillText( "Lvl " + player.level, 130, 150);
 
 	drawMatrix(player.matrix, player.pos, 10);
@@ -224,11 +225,9 @@ function get_points(cleared_lines, level)
 	return (player.level) * points_per_lines[cleared_lines]
 }
 
-var total_cleared_lines = 0;
-
 function clear_lines(arena)
 {
-	var cleared_lines = 0;
+	let cleared_lines = 0;
 	for( let y = arena.length-1; y>=0; y--)
 	{
 		all_set = true;
@@ -243,7 +242,7 @@ function clear_lines(arena)
 			cleared_lines++;
 			for( let y2 = y; y2>0; y2--)
 				arena[y2] = arena[y2-1];
-			//arena[0] = new Array(arena[0].length).fill(0);
+			arena[0] = new Array(arena[0].length).fill(0);
 			y++;
 		}
 	}
@@ -251,8 +250,8 @@ function clear_lines(arena)
 	{
 		audio.play();
 		player.points += get_points( cleared_lines, player.level )
-		total_cleared_lines += cleared_lines
-		player.level = 1 + (total_cleared_lines/10 | 0) 
+		player.total_cleared_lines += cleared_lines
+		player.level = 1 + (player.total_cleared_lines/10 | 0)
 	}
 }
 
@@ -272,18 +271,20 @@ function rotate(matrix, dir)
 		matrix.reverse();
 	}
 }
-var deltaTime = 0;
-var lastTime = 0;
+let deltaTime = 0;
+let lastTime = 0;
+let is_pause = false;
 function update(time = 0) {
 	gamepad.poll(time);
-	deltaTime = time - lastTime;
-	lastTime = time;
-	player.Update(deltaTime);
+	if(!is_pause)
+	{
+		deltaTime = time - lastTime;
+		lastTime = time;
+		player.Update(deltaTime);
+	}
 	draw();
 	requestAnimationFrame(update);
 }
-
-const arena = createMatrix(12, 20);
 
 function save_state()
 {
@@ -301,6 +302,7 @@ class Player
 		this.piece_bag = []
 		this.next_piece = this.getRandomPiece();
 		this.dropCounter = 0;
+		this.total_cleared_lines = 0;
 	}
 
 	Update(dt)
@@ -320,8 +322,8 @@ class Player
 	{
 		if( this.piece_bag.length == 0)
 		{
-			var pieces = shuffle_arr( ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] );
-			for(var i=0; i<pieces.length; i++)
+			let pieces = shuffle_arr( ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] );
+			for(let i=0; i<pieces.length; i++)
 			{
 				console.log(pieces[i])
 				this.piece_bag.push( createColorPiece( pieces[i] ) );
@@ -340,10 +342,11 @@ class Player
 
 	Drop()
 	{
+		if(is_pause) return;
 		this.pos.y++;
 		if( collide(arena, this) )
 		{
-			save_state();
+			//save_state();
 			this.pos.y--;
 			merge(arena, this);
 			clear_lines(arena);
@@ -355,6 +358,7 @@ class Player
 
 	HardDrop()
 	{
+		if(is_pause) return;
 		this.pos.y++;
 		while( !collide(arena, this) )
 			this.pos.y++;
@@ -375,6 +379,7 @@ class Player
 
 	Move(dir)
 	{
+		if(is_pause) return;
 		this.pos.x += dir;
 		if(collide(arena, this))
 		{
@@ -389,6 +394,7 @@ class Player
 	}
 	Rotate(dir)
 	{
+		if(is_pause) return;
 		rotate(this.matrix, dir);
 		if(collide(arena, this))
 		{
@@ -401,9 +407,28 @@ class Player
 			audio_turn.play();
 		}
 	}
+	pause()
+	{
+		console.log("PAUSE!")
+		is_pause = !is_pause;
+	}
 
 }
+
+function from_backup(dest, src)
+{
+	for (var key in src) {
+	    if (src.hasOwnProperty(key)) {
+	        dest[key] = src[key];
+	    }
+	}
+}
+
+arena = createMatrix(12, 20);
 player = new Player();
+
+// arena = [[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0],["purple",0,0,0,0,0,0,0,0,"red","yellow","yellow"],["purple","purple",0,"blue","blue","cyan","yellow","yellow","red","red","yellow","yellow"],["purple","orange","orange","blue","purple","cyan","yellow","yellow","red","cyan","green",0],["cyan","green",0,"blue","orange","orange","green","yellow","yellow","red","red","green"],["cyan","green","green",0,"purple","orange","green","green","orange","orange","red","red"],["cyan","red","yellow","yellow","orange",0,"blue","green","green","purple","purple","cyan"],["red","yellow","yellow","orange","orange","blue","blue","cyan","blue","green",0,"cyan"],["purple","purple","red","yellow","yellow","orange",0,"cyan","blue","green","green","cyan"],["purple","purple","purple","yellow","yellow","orange","orange","blue","blue",0,"green","cyan"]]
+// from_backup(player, {"pos":{"x":10,"y":12},"matrix":[["yellow","yellow",0],["yellow","yellow",0],[0,0,0]],"points":2600,"level":1,"piece_bag":[[[0,0,0],["purple","purple","purple"],[0,"purple",0]],[[0,"green","green"],["green","green",0],[0,0,0]],[[0,"orange",0],[0,"orange",0],[0,"orange","orange"]],[["red","red",0],[0,"red","red"],[0,0,0]],[[0,"cyan",0,0],[0,"cyan",0,0],[0,"cyan",0,0],[0,"cyan",0,0]]],"next_piece":[[0,"blue",0],[0,"blue",0],["blue","blue",0]],"dropCounter":216.69699999620207,"total_cleared_lines":9})
 
 gamepad = new GamepadController(document);
 gamepad.addListener( [ KeyCodes.get("x"), [0, GamePadCode.BUTTON_RIGHT]], 1000, 1000, (button) => { player.Rotate(-1); } );
@@ -418,6 +443,7 @@ gamepad.addListener( [ KeyCodes.LEFT, [0, GamePadCode.LEFT]], 400, 50, (button) 
 gamepad.addListener( [ KeyCodes.RIGHT, [0, GamePadCode.RIGHT]], 400, 50, (button) => { player.Move(1); } );
 
 gamepad.addListener( [ KeyCodes.SPACE, [0, GamePadCode.UP] ], 400, 50, (button) => { player.HardDrop(); } );
+gamepad.addListener( [ KeyCodes.get("p") ], 1000, 1000, (button) => {player.pause() } );
 
 
 player.Reset();
