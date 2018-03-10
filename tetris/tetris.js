@@ -281,8 +281,10 @@ function update(time = 0) {
 		deltaTime = time - lastTime;
 		lastTime = time;
 		player.Update(deltaTime);
+		play_song2(time);
 	}
 	draw();
+
 	requestAnimationFrame(update);
 }
 
@@ -325,7 +327,6 @@ class Player
 			let pieces = shuffle_arr( ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] );
 			for(let i=0; i<pieces.length; i++)
 			{
-				console.log(pieces[i])
 				this.piece_bag.push( createColorPiece( pieces[i] ) );
 			}
 		}
@@ -443,7 +444,9 @@ gamepad.addListener( [ KeyCodes.LEFT, [0, GamePadCode.LEFT]], 400, 50, (button) 
 gamepad.addListener( [ KeyCodes.RIGHT, [0, GamePadCode.RIGHT]], 400, 50, (button) => { player.Move(1); } );
 
 gamepad.addListener( [ KeyCodes.SPACE, [0, GamePadCode.UP] ], 400, 50, (button) => { player.HardDrop(); } );
-gamepad.addListener( [ KeyCodes.get("p") ], 1000, 1000, (button) => {player.pause() } );
+gamepad.addListener( [ KeyCodes.get("p") ], 1000, 1000, (button) => {player.pause(); } );
+// gamepad.addListener( [ KeyCodes.get("w") ], 1000, 1000, (button) => {player.level++; } );
+
 
 
 player.Reset();

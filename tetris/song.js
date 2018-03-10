@@ -1,26 +1,23 @@
 function create_src(audioContext, volume, attack, decay, frequency, t, length_s)
 {
-  let samplingRate = 44100;
-  let lambda = frequency * 2 * Math.PI / samplingRate;
-  let myBuffer = audioContext.createBuffer(1, length_s*samplingRate | 0, samplingRate);
-  let gain = audioContext.createGain();
+	let gain = audioContext.createGain();
 
-  let myArray = myBuffer.getChannelData(0);
-  for (let i = 0 ; i < length_s*samplingRate ; i++)
-  {
-    myArray[i] = Math.sin(i * lambda);
-  }
+	gain.gain.setValueAtTime(0, t);
+	gain.gain.linearRampToValueAtTime(volume, t + attack);
+	gain.gain.setValueAtTime(volume, t+length_s - decay);
+	gain.gain.linearRampToValueAtTime(0.0, t+length_s);
 
-  gain.gain.setValueAtTime(0, t);
-  gain.gain.linearRampToValueAtTime(volume, t + attack);
-  gain.gain.setValueAtTime(volume, t+length_s - decay);
-  gain.gain.linearRampToValueAtTime(0.0, t+length_s);
+	let myOscillator = audioContext.createOscillator();
+	myOscillator.frequency.setValueAtTime(frequency, t);
 
-  let src = audioContext.createBufferSource();
-  src.buffer = myBuffer;
-  src.connect(gain);
-  gain.connect(audioContext.destination);
-  return src;
+	myOscillator.connect(gain);
+	myOscillator.start(t);
+	// necessary, otherwise doesn't work anymore after some time!
+	// (propably due to garbage collection / limited nr of channels)
+	myOscillator.stop(t+length_s);
+
+	gain.connect(audioContext.destination);
+	return myOscillator;
 }
 
 function get_0based_note(note)
@@ -95,22 +92,14 @@ function uncompress_song(song)
 	}
 }
 
-function play_song(audioContext, song, config)
+function play_song(t, audioContext, song, config)
 {
 	uncompress_song( song );
-	let t = 0;
 	let volume = config.volume;
 	let attack = config.attack;
 	let decay = config.decay;
-	let bpm = config.bpm; // bpm
-
-	// [1, 2, 3, 4, 5]
-	//overtones = [ 0.1, 0.2, 0.0, 0.1 ]
+	let bpm = config.bpm;
 	overtones = config.overtones
-	// overtones = [ 1, 0.5, 0.25, 0.125 ]
-	// overtones = [ 1 ]
-	// overtones = [ 0.5, 0, 0, 0, 0, 0.1 ]
-	// overtones = [ 0.5, 0, 0.05, 0.01 ]
 
 	for(let i=0; i<song.length; i++)
 	{
@@ -123,11 +112,12 @@ function play_song(audioContext, song, config)
 		{
 			for(let i =0; i<overtones.length; i++)
 			{
-				create_src(audioContext, volume * overtones[i], attack, decay, f * (i+1), t, length*0.95).start(t);
+				create_src(audioContext, volume * overtones[i], attack, decay, f * (i+1), t, length*0.95)
 			}
 		}
 		t = t + length;
 	}
+	return t;
 }
 
 // https://en.wikipedia.org/wiki/Korobeiniki
@@ -147,7 +137,7 @@ song_korobeiniki = [
 	["h", 2], ["h", 1], ["c", 1],
 	["d", 2], ["e"],
 	["c"], ["a"],
-	["a", 3]
+	["a", 3], ["r", 1]
 ]
 
 song_korobeiniki_bass = [
@@ -163,5 +153,18 @@ song_korobeiniki_bass = [
 
 var audioContext = new AudioContext();
 var BPM = 85;
-play_song( audioContext, song_korobeiniki, {volume: 0.15, attack: 0.002, decay: 0.03, bpm: BPM, overtones: [ 0.5, 0.2, 0.2, 0.1, 0.1 ] } );
-play_song( audioContext, song_korobeiniki_bass, {volume: 0.1, attack: 0.005, decay: 0.03, bpm: BPM, overtones: [ 0.3, 0.1, 0, 0.1 ] } );
+
+var playtime = 0;
+var length = 0;
+function play_song2(time)
+{
+	time = time / 1000;
+	if( time-playtime > length)
+	{
+		console.log("play Korobeiniki!")
+		let time2 = play_song( time, audioContext, song_korobeiniki, {volume: 0.15, attack: 0.002, decay: 0.03, bpm: BPM, overtones: [ 0.5, 0.2, 0.2, 0.1, 0.1 ] } )
+		length = time2-time;
+		play_song( time, audioContext, song_korobeiniki_bass, {volume: 0.1, attack: 0.005, decay: 0.03, bpm: BPM, overtones: [ 0.3, 0.1, 0, 0.1 ] } )
+		playtime = time;
+	}
+}
