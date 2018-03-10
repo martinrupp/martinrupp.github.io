@@ -41,9 +41,8 @@ function createPiece(type) {
 	else if(type === 'O')
 	{
 		return [
-		[1, 1, 0],
-		[1, 1, 0],
-		[0, 0, 0] ];
+		[1, 1],
+		[1, 1] ];
 	}
 	else if(type === 'L')
 	{
@@ -84,16 +83,13 @@ function createPiece(type) {
 }
 function createColorPiece( piece )
 {
-	// official Tetris Guideline colors
-	const colors = { I:'cyan', O:'yellow', T:'purple', S:'green', Z:'red', J:'blue', L:'orange'};
-	m = createPiece(piece);
-
+	m = createPiece ( piece );
 	for(let y=0; y<m.length; y++)
 	{
 		for(let x=0; x<m[y].length; x++)
 		{
 			if(m[y][x] !== 0)
-				m[y][x] = colors[piece];
+				m[y][x] = piece;
 		}
 	}
 	return m;
@@ -190,7 +186,8 @@ function drawMatrix(matrix, offset, scale, as_ghost=false) {
 				}
 				else
 				{
-					context.fillStyle = value;
+					const colors = { I:'cyan', O:'yellow', T:'purple', S:'green', Z:'red', J:'blue', L:'orange'};
+					context.fillStyle = colors[value];
 					context.fillRect( (x + offset.x)*scale, (y + offset.y)*scale, scale, scale);
 					context.beginPath()
 					context.rect( (x + offset.x)*scale, (y + offset.y)*scale, scale, scale);
@@ -292,128 +289,6 @@ function save_state()
 {
 	console.log(JSON.stringify(arena))
 	console.log(JSON.stringify(player))
-}
-
-class Player
-{
-	constructor() {
-		this.pos = {x: 5, y: 5};
-		this.matrix = createMatrix(3,3);
-		this.points = 0;
-		this.level = 1;
-		this.piece_bag = []
-		this.next_piece = this.getRandomPiece();
-		this.dropCounter = 0;
-		this.total_cleared_lines = 0;
-	}
-
-	Update(dt)
-	{
-		this.dropCounter += dt;
-		if( this.dropCounter > drop_time(this.level)*1000 )
-			this.Drop();
-	}
-
-	// we're using a "bag" system for the random pieces like described here
-	// http://tetris.wikia.com/wiki/Random_Generator . this will ensentially
-	// put all 7 possible pieces (IOTSZJL) into a bag, shuffle it, then draw
-	// from it. if bag is empty, create new bag. this ensures max distance of
-	// 12 between any two same pieces.
-	// see also http://tetris.wikia.com/wiki/Tetris_Guideline .
-	getRandomPiece()
-	{
-		if( this.piece_bag.length == 0)
-		{
-			let pieces = shuffle_arr( ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] );
-			for(let i=0; i<pieces.length; i++)
-			{
-				this.piece_bag.push( createColorPiece( pieces[i] ) );
-			}
-		}
-		return this.piece_bag.shift()
-	}
-
-	Reset()
-	{
-		this.matrix = this.next_piece;
-		this.pos.y = 0;
-		this.pos.x = (arena[0].length / 2 | 0) - (this.matrix[0].length / 2 | 0);
-		this.next_piece = this.getRandomPiece()
-	}
-
-	Drop()
-	{
-		if(is_pause) return;
-		this.pos.y++;
-		if( collide(arena, this) )
-		{
-			//save_state();
-			this.pos.y--;
-			merge(arena, this);
-			clear_lines(arena);
-			audio_drop.play()
-			this.Reset()
-		}
-		this.dropCounter = 0;
-	}
-
-	HardDrop()
-	{
-		if(is_pause) return;
-		this.pos.y++;
-		while( !collide(arena, this) )
-			this.pos.y++;
-		this.pos.y--;
-		this.Drop();
-	}
-
-	GhostPos()
-	{
-		let y_backup = this.pos.y;
-		this.pos.y++;
-		while( !collide(arena, this) )
-			this.pos.y++;
-		let ghostpos = { x: this.pos.x, y: this.pos.y-1 };
-		this.pos.y = y_backup;
-		return ghostpos;
-	}
-
-	Move(dir)
-	{
-		if(is_pause) return;
-		this.pos.x += dir;
-		if(collide(arena, this))
-		{
-			// revert collision
-			this.pos.x -= dir;
-		}
-		else
-		{
-			audio_dit.currentTime = 0;
-			audio_dit.play()
-		}
-	}
-	Rotate(dir)
-	{
-		if(is_pause) return;
-		rotate(this.matrix, dir);
-		if(collide(arena, this))
-		{
-			// collision, revert rotation
-			rotate(this.matrix, -dir);
-		}
-		else
-		{
-			audio_turn.currentTime = 0;
-			audio_turn.play();
-		}
-	}
-	pause()
-	{
-		console.log("PAUSE!")
-		is_pause = !is_pause;
-	}
-
 }
 
 function from_backup(dest, src)
