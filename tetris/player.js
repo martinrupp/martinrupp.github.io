@@ -137,7 +137,7 @@ class Player
 	{
 		if(is_pause) return;
 
-		let kick_data = [ [0,0], [-1, 0], [1, 0] ];
+		let kick_data = [ [0,0], [-1, 0], [1, 0], [-2, 0], [2, 0] ];
 		for(let i=0; i<kick_data.length; i++)
 		{
 			if( this.TryRotate(dir, kick_data[i][0], kick_data[i][1] ) )
