@@ -54,11 +54,39 @@ function norm(v)
 
 var deltaTime = 0;
 var lastTime = 0;
-function update(time = 0) {
+
+var recording = []
+
+var recorded_times = [];
+var recorded_keys = [];
+
+var playback_ = false;
+var step = 0;
+
+function update(time = 0)
+{
+	if( !playback_ )
+	{
+		gamepad.poll(time);
+		// poll logic might change playback_
+	}
+
+	if( !playback_ )
+		recording.push( {time: time, keys: Object.assign({}, gamepad.keys) } );
+	else
+	{
+		if(step < recorded_times.length )
+		{
+			time = recorded_times[step];
+			let keys = {};
+			recorded_keys[step].forEach( (v) => { keys[v] = true; });
+			gamepad.playback(time, keys);
+			step++;
+		}
+	}
 	// gamepad.poll(time);
 	deltaTime = time - lastTime;
 	lastTime = time;
-	gamepad.poll(time);
 
 	objects.forEach( m => {
 			if( !m.dead )
@@ -142,6 +170,7 @@ class Enemy
 		if(num_enemies == 0)
 		{
 			lost_won = "YOU WON!!!";
+			// convert_rec();
 			boost.pause();
 		}
 		this.dead = true;
@@ -150,7 +179,10 @@ class Enemy
 	{
 		let shoot_time = 4000;
 		if(this.last_shot == 0)
+		{
 			this.last_shot = time + (random()*shoot_time | 0);
+			console.log(time, this.last_shot);
+		}
 		else if(time-this.last_shot > shoot_time && !player.dead)
 		{
 			var v = sub(player.pos, this.pos)
@@ -187,7 +219,7 @@ class Enemy
 					SP = norm(vel)
 					t *= SP/speed;
 				}
-				console.log(SP);
+				// console.log(SP);
 
 				// only y:
 
@@ -253,6 +285,7 @@ class Player
 	kill()
 	{
 		lost_won = "YOU LOST!";
+		// convert_rec();
 		boost.pause();
 		this.dead = true;
 	}
@@ -376,6 +409,7 @@ class Player
 			var pos = Object.assign({}, this.pos);
 			var v = -600;
 			var vel = { x: player.vel.x+Math.sin(player.alpha)*v, y: player.vel.y+Math.cos(player.alpha)*v };
+			// var vel = { x: Math.sin(player.alpha)*v, y: Math.cos(player.alpha)*v };
 			var n = norm(vel)
 			pos.x += vel.x/n*10;
 			pos.y += vel.y/n*10;
@@ -408,10 +442,30 @@ class Player
 		return this.dead;
 	}
 }
+function convert_rec()
+{
+	recorded_times = [];
+	recorded_keys = [];
+	// console.log(JSON.stringify(recording))
+	for(var i=0; i<recording.length; i++)
+	{
+		k = []
+		for( let v in recording[i].keys )
+		{
+			if( recording[i].keys[v] )
+				k.push(v);
+		}
+		recorded_keys.push(k);
+		recorded_times.push(recording[i].time)
+	}
+	console.log(JSON.stringify(recorded_times))
+	console.log(JSON.stringify(recorded_keys))
+}
 
 var objects;
 function restart()
 {
+	if(! playback_) recording = [];
 	player = new Player();
 
 	objects = [ player ]
@@ -424,29 +478,32 @@ function restart()
 	}
 }
 
+function playback()
+{
+	playback_ = true;
+	restart();
+}
+
+// playback();
 restart();
 
 gamepad.addListener( [ KeyCodes.SPACE, [0, GamePadCode.BUTTON_RIGHT] ], 300, 100, (button) => { player.shoot(); } );
 
-gamepad.addListener( [ KeyCodes.get("r") ], 300, 100, (button) => { restart(); } );
-
-// window.onkeydown = function(e) { keys[e.keyCode] = true; }
-// 	if( event.keyCode === 37)
-// 		player.alpha += 0.1;
-// 	else if(event.keyCode === 39)
-// 		player.alpha -= 0.1;
-// 	else if(event.keyCode === 38)
-// 		player.Move(-1);
-// 	else if(event.keyCode === 40)
-// 		player.Move(+1);
-// });
-//
-//gamepad = new GamepadController();
-//gamepad.addListener( 1, 1000, 1000, (button) => { player.Rotate(-1); } );
-//gamepad.addListener( 2, 1000, 1000, (button) => { player.Rotate(+1); } );
-//gamepad.addListener( 13, 50, 30, (button) => { player.Drop(); } );
-//gamepad.addListener( 14, 400, 50, (button) => { player.Move(-1); } );
-//gamepad.addListener( 15, 400, 50, (button) => { player.Move(1); } );
+document.addEventListener('keydown', event => {
+			if(event.keyCode == KeyCodes.get("r")[1])
+			{
+				playback_ = false;
+				gamepad.keys = [];
+				restart();
+			}
+			else if(event.keyCode == KeyCodes.get("d")[1])
+			{
+				step = 0;
+				playback();
+			}
+		});
+// gamepad.addListener( [ KeyCodes.get("r") ], 300, 100, (button) => { playback_ = false; restart(); } );
+// gamepad.addListener( [ KeyCodes.get("d") ], 300, 100, (button) => { playback(); } );
 
 
 update();

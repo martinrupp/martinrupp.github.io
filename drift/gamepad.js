@@ -80,6 +80,11 @@ class GamepadController
 	{
 		return this.keys[keyid];
 	}
+	playback(time, keys)
+	{
+		this.keys = keys;
+		this.poll(time);
+	}
 
 	poll(time)
 	{
