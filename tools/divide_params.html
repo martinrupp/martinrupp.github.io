@@ -18,6 +18,9 @@
 
 
 <script>
+function strcmp(a, b) {
+  return a.localeCompare(b);
+}
 function compare() {
   var x, text;
 
@@ -25,13 +28,13 @@ function compare() {
   x1 = document.getElementById("string1").value;
   x2 = document.getElementById("string2").value;
 
-  text1 = x1.split(" ").sort();
-  text2 = x2.split(" ").sort();
+  text1 = x1.split(" ").sort(strcmp);
+  text2 = x2.split(" ").sort(strcmp);
 
   var body = document.getElementsByTagName('body')[0];
   var tbl = document.getElementById("table");
   if( tbl )
-  	body.removeChild(tbl);
+    body.removeChild(tbl);
 
   var tbl = document.createElement('table');
   tbl.setAttribute("id", "table");
@@ -44,36 +47,36 @@ function compare() {
   var j = 0;
   for ( var kkk = 0; i < text1.length || j < text2.length ; kkk++)
   {
-  	console.log("i = "+ i + " j = " + j)
+    console.log("i = "+ i + " " + text1[i] + " j = " + j + " " + text2[j])
     
-  	if(kkk > 200) break;
-  	var t1 = i >= text1.length ? "" : text1[i];
+    if(kkk > 200) break;
+    var t1 = i >= text1.length ? "" : text1[i];
     var t2 = j >= text2.length ? "" : text2[j];
     if( i < text1.length && j < text2.length)
     {
-	    var k = t1.localeCompare(t2);
-	    if( k < 0 )
-	    {
-	    	t2 = "";
-	    	i++
-	    }
-	    else if( k > 0 )
-	    {
-	    	t1 = "";
-	    	j++
-	    }
-	    else { i++; j++; }
-	}
-	else if(i >= text1.length)
-	{
-		j++;
-	}
-	else if(j >= text2.length)
-	{
-		i++;
-	}
+      var k = strcmp(t1,t2);
+      if( k < 0 )
+      {
+        t2 = "";
+        i++
+      }
+      else if( k > 0 )
+      {
+        t1 = "";
+        j++
+      }
+      else { i++; j++; }
+    }
+    else if(i >= text1.length)
+    {
+      j++;
+    }
+    else if(j >= text2.length)
+    {
+      i++;
+    }
 
-	if( t1 === "" && t2 === "" ) continue;
+    if( t1 === "" && t2 === "" ) continue;
 
 
     var tr = document.createElement('tr');
@@ -82,8 +85,8 @@ function compare() {
     var x = td;
     if( t2 === "")
     {
-    	x = document.createElement("B");
-	   	td.appendChild(x)
+      x = document.createElement("B");
+      td.appendChild(x)
     }
     x.appendChild(document.createTextNode( t1 ));
     tr.appendChild(td);
@@ -96,8 +99,8 @@ function compare() {
     x = td;
     if( t1 === "")
     {
-    	x = document.createElement("B");
-	   	td.appendChild(x)
+      x = document.createElement("B");
+      td.appendChild(x)
     }
     x.appendChild(document.createTextNode( t2 ));
     tr.appendChild(td);
