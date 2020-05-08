@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Simple Tool to Compare Configuration Parameters</h2>
+
+<p>Text 1:</p>
+
+<textarea id="string1" rows="15" cols="200"></textarea>
+
+<p>Text 2:</p>
+
+<textarea id="string2" rows="15" cols="200"></textarea>
+
+<br>
+
+<button type="button" onclick="compare()">Compare</button>
+
+
+<script>
+function compare() {
+  var x, text;
+
+  // Get the value of the input field with id="numb"
+  x1 = document.getElementById("string1").value;
+  x2 = document.getElementById("string2").value;
+
+  text1 = x1.split(" ").sort();
+  text2 = x2.split(" ").sort();
+
+  var body = document.getElementsByTagName('body')[0];
+  var tbl = document.getElementById("table");
+  if( tbl )
+  	body.removeChild(tbl);
+
+  var tbl = document.createElement('table');
+  tbl.setAttribute("id", "table");
+  tbl.style.width = '100%';
+  tbl.style['table-layout'] = 'fixed';
+  tbl.setAttribute('border', '1');
+  var tbdy = document.createElement('tbody');
+
+  var i = 0;
+  var j = 0;
+  for ( var kkk = 0; i < text1.length || j < text2.length ; kkk++)
+  {
+  	console.log("i = "+ i + " j = " + j)
+    
+  	if(kkk > 200) break;
+  	var t1 = i >= text1.length ? "" : text1[i];
+    var t2 = j >= text2.length ? "" : text2[j];
+    if( i < text1.length && j < text2.length)
+    {
+	    var k = t1.localeCompare(t2);
+	    if( k < 0 )
+	    {
+	    	t2 = "";
+	    	i++
+	    }
+	    else if( k > 0 )
+	    {
+	    	t1 = "";
+	    	j++
+	    }
+	    else { i++; j++; }
+	}
+	else if(i >= text1.length)
+	{
+		j++;
+	}
+	else if(j >= text2.length)
+	{
+		i++;
+	}
+
+	if( t1 === "" && t2 === "" ) continue;
+
+
+    var tr = document.createElement('tr');
+
+    var td = document.createElement('td');
+    var x = td;
+    if( t2 === "")
+    {
+    	x = document.createElement("B");
+	   	td.appendChild(x)
+    }
+    x.appendChild(document.createTextNode( t1 ));
+    tr.appendChild(td);
+
+    td.style.width = '50%';
+    td.style.wordWrap = 'break-word';
+    td.style['word-wrap'] = 'break-word';
+
+    var td = document.createElement('td');    
+    if( t1 === "")
+    {
+    	x = document.createElement("B");
+	   	td.appendChild(x)
+    }
+    x.appendChild(document.createTextNode( t2 ));
+    tr.appendChild(td);
+
+    td.style.width = '50%';
+    td.style.wordWrap = 'break-word';
+    td.style['word-wrap'] = 'break-word';
+    tbdy.appendChild(tr);
+  }
+  tbl.appendChild(tbdy);
+  body.appendChild(tbl)
+
+  document.getElementById("demo").innerHTML = text;
+}
+</script>
+
+</body>
+</html> 
