@@ -47,7 +47,7 @@ function compare() {
   var j = 0;
   for ( var kkk = 0; i < text1.length || j < text2.length ; kkk++)
   {
-    console.log("i = "+ i + " " + text1[i] + " j = " + j + " " + text2[j])
+    //console.log("i = "+ i + " " + text1[i] + " j = " + j + " " + text2[j])
     
     if(kkk > 200) break;
     var t1 = i >= text1.length ? "" : text1[i];
@@ -112,8 +112,6 @@ function compare() {
   }
   tbl.appendChild(tbdy);
   body.appendChild(tbl)
-
-  document.getElementById("demo").innerHTML = text;
 }
 </script>
 
