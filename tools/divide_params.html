@@ -3,7 +3,7 @@
 <body>
 
 <h2>Simple Tool to Compare Configuration Parameters</h2>
-
+<button type="demo" onclick="demo()">Demo</button>
 <p>Text 1:</p>
 
 <textarea id="string1" rows="15" cols="200"></textarea>
@@ -20,6 +20,13 @@
 <script>
 function strcmp(a, b) {
   return a.localeCompare(b);
+}
+
+function demo()
+{
+  document.getElementById("string1").value = "-param1=HELLO -param2=WORLD -path=/this/is/my/long/path -path2=/this/is/another/long/path -param3=config -XX=2 -AA=4 -BB=25 -i";
+  document.getElementById("string2").value = "-AA=4 -BB=23 -XX=2 -param1=HELLO -i -path=/this/is/my/long/path -path2=/this/is/another/wrong/path -param2=WORLD -param3=/path/";
+  compare();
 }
 function compare() {
   var x, text;
