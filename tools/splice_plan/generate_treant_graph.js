@@ -1,12 +1,13 @@
 function create_treant_node(node, parent, chart_config)
 {
     var newNode = {
-        HTMLclass: 'light-gray',
         text:{
             name: node.name
         }
     }
 
+    // see style.css for different colors for different names,
+    // e.g. GroupBy -> coral
     newNode.HTMLclass = node.name;
 
     var colormap = {
