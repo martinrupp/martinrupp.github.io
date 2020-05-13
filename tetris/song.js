@@ -162,7 +162,7 @@ function play_song2(time)
 	if( time-playtime > length)
 	{
 		console.log("play Korobeiniki!")
-		let time2 = play_song( time, audioContext, song_korobeiniki, {volume: 0.15, attack: 0.002, decay: 0.03, bpm: BPM, overtones: [ 0.5, 0.2, 0.2, 0.1, 0.1 ] } )
+		let time2 = play_song( time, audioContext, song_korobeiniki, {volume: 0.02, attack: 0.002, decay: 0.03, bpm: BPM, overtones: [ 0.5, 0.2, 0.2, 0.1, 0.1 ] } )
 		length = time2-time;
 		play_song( time, audioContext, song_korobeiniki_bass, {volume: 0.1, attack: 0.005, decay: 0.03, bpm: BPM, overtones: [ 0.3, 0.1, 0, 0.1 ] } )
 		playtime = time;
