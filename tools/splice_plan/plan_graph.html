@@ -16,6 +16,7 @@
       <option selected value="simple_join">Simple Join</option>
       <option value="ds_11">TPC-DS 11</option>
       <option value="ds_74">TPC-DS 74</option>
+      <option value="ds_20xt">TPC-DS 20xt</option>
     </select>
   </label>
   <br>
@@ -37,10 +38,12 @@
         {
             if( selected === "simple_join" )
                 return simple_join_example();
-            else if( selected == "ds_11" )
+            else if( selected === "ds_11" )
                 return get_ds_11_example();
-            else if( selected == "ds_74" )
+            else if( selected === "ds_74" )
                 return get_ds_74_example();
+            else if( selected === "ds_20xt" )
+                return get_ds_20xt_example();
         }
         function fill_example(selected)
         {

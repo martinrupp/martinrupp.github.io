@@ -188,3 +188,24 @@ function get_ds_74_example()
                               ->  TableScan[STORE_SALES(1616)](n=1,totalCost=5447.964,scannedRows=2880404,outputRows=2880404,outputHeapSize=31.889 MB,partitions=19)  `;
   return text;
 }
+
+function get_ds_20xt_example()
+{
+  text = `Cursor(n=17,rows=100,updateMode=,engine=Spark (forced))                                                                                                                                                                                                         
+  ->  ScrollInsensitive(n=17,totalCost=152001.779,outputRows=100,outputHeapSize=3.383 MB,partitions=1)                                                                                                                                                          
+    ->  Limit(n=16,totalCost=151998.697,outputRows=100,outputHeapSize=3.383 MB,partitions=1,fetchFirst=100)                                                                                                                                                     
+      ->  OrderBy(n=18,totalCost=151998.697,outputRows=100,outputHeapSize=3.383 MB,partitions=1)                                                                                                                                                                
+        ->  ProjectRestrict(n=14,totalCost=58363.38,outputRows=1144534,outputHeapSize=3.383 MB,partitions=1)                                                                                                                                                    
+          ->  WindowFunction(n=13,totalCost=2547.41,outputRows=1271705,outputHeapSize=3.383 MB,partitions=1)                                                                                                                                                    
+            ->  ProjectRestrict(n=12,totalCost=116726.76,outputRows=1144534,outputHeapSize=3.383 MB,partitions=1)                                                                                                                                               
+              ->  GroupBy(n=11,totalCost=116726.76,outputRows=1144534,outputHeapSize=3.383 MB,partitions=1)                                                                                                                                                     
+                ->  ProjectRestrict(n=10,totalCost=5173.983,outputRows=1144534,outputHeapSize=3.383 MB,partitions=1)                                                                                                                                            
+                  ->  BroadcastJoin(n=8,totalCost=5173.983,outputRows=1144534,outputHeapSize=3.383 MB,partitions=1,preds=[(CS_ITEM_SK[8:2] = I_ITEM_SK[8:6])])                                                                                                  
+                    ->  ProjectRestrict(n=7,totalCost=39.757,outputRows=16043,outputHeapSize=3.383 MB,partitions=1,preds=[(I_CATEGORY[6:6] IN (Books                                             ,Jewelry                                           ,Sports    &
+                      ->  TableScan[ITEM(58400)](n=6,totalCost=39.65,scannedRows=17825,outputRows=17825,outputHeapSize=3.383 MB,partitions=1)                                                                                                                   
+                    ->  BroadcastJoin(n=4,totalCost=3824.328,outputRows=1144534,outputHeapSize=3.291 MB,partitions=1,preds=[(CS_SOLD_DATE_SK[4:1] = D_DATE_SK[4:4])])                                                                                           
+                      ->  TableScan[DATE_DIM(58496)](n=2,totalCost=40.84,scannedRows=18420,outputRows=8737,outputHeapSize=3.291 MB,partitions=1,preds=[(D_DATE[2:2] <= (2001-01-12 + 30)),(D_DATE[2:2] >= 2001-01-12)])                                         
+                      ->  ProjectRestrict(n=1,totalCost=2547.41,outputRows=1271705,outputHeapSize=3.638 MB,partitions=1)                                                                                                                                        
+                        ->  TableScan[CATALOG_SALES(58080)](n=0,totalCost=2547.41,scannedRows=1271705,outputRows=1271705,outputHeapSize=3.638 MB,partitions=1)   `;
+  return text;
+}

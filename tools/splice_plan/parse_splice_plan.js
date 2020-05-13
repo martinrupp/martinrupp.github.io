@@ -37,7 +37,7 @@ function parse_first(text)
     // -> m[1] = ``
     // -> m[2] = Cursor
     // -> m[3] = n=6,rows=2369593,updateMode=READ_ONLY (1),engine=Spark
-    var m = text.match(/^( *)(\S*)\((.*)\)/);
+    var m = text.match(/^( *)(\S*)\((.*)[\)&]/);
     return parse_node(m)
 }
 
@@ -48,7 +48,8 @@ function parse_other(text)
     // -> m[1] = `     `
     // -> m[2] = ProjectRestrict
     // -> m[3] = n=4,totalCost=59891.557,outputRows=2369593,outputHeapSize=488.804 MB,partitions=1
-    var m = text.match(/^( *)->  (\S*)\((.*)\)/);
+    // [\)&] because some lines don't end with ), but with &
+    var m = text.match(/^( *)->  (\S*)\((.*)[\)&]/);
     return parse_node(m);
 }
 
