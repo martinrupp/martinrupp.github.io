@@ -57,6 +57,7 @@
             var tbl = document.getElementById("splice_plan");
             if ( tbl )
             {
+                // this is a hack because i couldn't get Treant.js to update or delete the tree
                 body.removeChild(tbl);
             }
             // <div class="chart" id="splice_plan0"> --@-- </div>
@@ -71,7 +72,7 @@
             var root_node = parse_splice_plan(text);
             console.log(root_node);
 
-            // replace with https://gojs.net/latest/samples/orgChartEditor.html
+            // todo: replace with https://gojs.net/latest/samples/orgChartEditor.html
 
             var config = {
                 container: "#splice_plan",
