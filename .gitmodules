@@ -1,0 +1,9 @@
+[submodule "tools/splice_plan"]
+	path = tools/splice_plan
+	url = https://github.com/martinrupp/splice_plan_viewer
+[submodule "tetris"]
+	path = tetris
+	url = https://github.com/martinrupp/tetris_js
+[submodule "drift"]
+	path = drift
+	url = https://github.com/martinrupp/drift_invaders
