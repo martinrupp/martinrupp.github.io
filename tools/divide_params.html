@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <title>Simple Tool to Compare Configuration Parameters</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+
 <body>
 
 <h2>Simple Tool to Compare Configuration Parameters</h2>
@@ -14,10 +20,12 @@
 
 <br>
 
-<button type="button" onclick="compare()">Compare</button>
+<button type="button" onclick="compare()">Compare</button> Use Char Diff: <input type="checkbox" id="checkCharDiff" checked="true"> ( Char Diff is using <a href=http://incaseofstairs.com/jsdiff/diff.js>http://incaseofstairs.com/jsdiff/diff.js</a> .)
+<br>
 
+<script src="http://incaseofstairs.com/jsdiff/diff.js"></script>
+<script defer>
 
-<script>
 function strcmp(a, b) {
   return a.localeCompare(b);
 }
@@ -25,9 +33,59 @@ function strcmp(a, b) {
 function demo()
 {
   document.getElementById("string1").value = "-param1=HELLO -param2=WORLD -path=/this/is/my/long/path -path2=/this/is/another/long/path -param3=config -XX=2 -AA=4 -BB=25 -i";
-  document.getElementById("string2").value = "-AA=4 -BB=23 -XX=2 -param1=HELLO -i -path=/this/is/my/long/path -path2=/this/is/another/wrong/path -param2=WORLD -param3=/path/";
+  document.getElementById("string2").value = "-AA=4 -BB=250 -XX=2 -param1=HELLO -i -path=/this/is/my/long/path -path2=/this/is/another/changed/path -param2=WORLD -param3=/path/";
   compare();
 }
+
+function get_diff(text1, text2)
+{
+  var diff = JsDiff["diffChars"](text1, text2)
+  var num_add = 0, num_rem = 0;
+  for (var i=0; i < diff.length; i++)
+  {
+    if (diff[i].removed)
+      num_rem += diff[i].value.length;
+    else if(diff[i].added)
+      num_add += diff[i].value.length;
+  }
+  var num_diffs = num_add+num_rem;
+  if( num_diffs == 0 || num_add > (text1.length+text2.length)/4 || num_rem > (text1.length+text2.length)/4 || num_diffs > (text1.length+text2.length)/2 )
+    return null;
+  else
+    return diff;
+}
+
+function dodiff(dest, diff)
+{
+  dest.textContent = '';
+  var fragment = document.createDocumentFragment();
+
+  for (var i=0; i < diff.length; i++) {
+
+    if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
+      var swap = diff[i];
+      diff[i] = diff[i + 1];
+      diff[i + 1] = swap;
+    }
+
+    var node;
+    if (diff[i].removed) {
+      node = document.createElement('del');
+      node.appendChild(document.createTextNode(diff[i].value));
+    } else if (diff[i].added) {
+      node = document.createElement('ins');
+      node.appendChild(document.createTextNode(diff[i].value));
+    } else {
+      node = document.createTextNode(diff[i].value);
+    }
+    fragment.appendChild(node);
+  }
+
+  dest.textContent = '';
+  dest.appendChild(fragment);
+  return fragment;
+}
+
 function compare() {
   var x, text;
 
@@ -59,6 +117,7 @@ function compare() {
     if(kkk > 200) break;
     var t1 = i >= text1.length ? "" : text1[i];
     var t2 = j >= text2.length ? "" : text2[j];
+    var tt1=t1, tt2=t2;
     if( i < text1.length && j < text2.length)
     {
       var k = strcmp(t1,t2);
@@ -116,6 +175,23 @@ function compare() {
     td.style.wordWrap = 'break-word';
     td.style['word-wrap'] = 'break-word';
     tbdy.appendChild(tr);
+
+    var diff = get_diff(tt1, tt2)
+    if( document.getElementById("checkCharDiff").checked && diff )
+    {
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.colSpan = "2";
+      x = document.createElement("B");
+      td.appendChild(x);
+      dodiff( x, diff);
+      td.style.width = '50%';
+      td.style.wordWrap = 'break-word';
+      td.style['word-wrap'] = 'break-word';
+      td.style['text-align'] = 'center';
+      tr.appendChild(td);
+      tbdy.appendChild(tr);
+    }
   }
   tbl.appendChild(tbdy);
   body.appendChild(tbl)
