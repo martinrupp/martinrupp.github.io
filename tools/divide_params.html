@@ -9,6 +9,8 @@
 <body>
 
 <h2>Simple Tool to Compare Configuration Parameters</h2>
+Char Diff is using <a href=http://incaseofstairs.com/jsdiff/diff.js>http://incaseofstairs.com/jsdiff/diff.js</a> <br>
+
 <button type="demo" onclick="demo()">Demo</button>
 <p>Text 1:</p>
 
@@ -20,10 +22,10 @@
 
 <br>
 
-<button type="button" onclick="compare()">Compare</button> Use Char Diff: <input type="checkbox" id="checkCharDiff" checked="true"> ( Char Diff is using <a href=http://incaseofstairs.com/jsdiff/diff.js>http://incaseofstairs.com/jsdiff/diff.js</a> .)
+<button type="button" onclick="compare()">Compare</button> Use Char Diff: <input type="checkbox" id="checkCharDiff" checked="true">
 <br>
 
-<script src="http://incaseofstairs.com/jsdiff/diff.js"></script>
+<script src="diff.js"></script>
 <script defer>
 
 function strcmp(a, b) {
