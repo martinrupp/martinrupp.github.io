@@ -7,3 +7,6 @@
 [submodule "drift"]
 	path = drift
 	url = https://github.com/martinrupp/drift_invaders
+[submodule "vacsim"]
+	path = vacsim
+	url = https://github.com/martinrupp/vacsim
