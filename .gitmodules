@@ -10,3 +10,6 @@
 [submodule "vacsim"]
 	path = vacsim
 	url = https://github.com/martinrupp/vacsim
+[submodule "rommey"]
+	path = rommey
+	url = https://github.com/martinrupp/rommey
