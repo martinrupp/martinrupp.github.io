@@ -13,3 +13,6 @@
 [submodule "rommey"]
 	path = rommey
 	url = https://github.com/martinrupp/rommey
+[submodule "minecraftjs"]
+	path = minecraftjs
+	url = https://github.com/martinrupp/minecraftjs
