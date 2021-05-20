@@ -16,3 +16,6 @@
 [submodule "minecraftjs"]
 	path = minecraftjs
 	url = https://github.com/martinrupp/minecraftjs
+[submodule "html_invaders"]
+	path = html_invaders
+	url = https://github.com/martinrupp/html_invaders
