@@ -19,3 +19,6 @@
 [submodule "html_invaders"]
 	path = html_invaders
 	url = https://github.com/martinrupp/html_invaders
+[submodule "onlinevisjs"]
+	path = onlinevisjs
+	url = https://github.com/martinrupp/onlinevisjs
